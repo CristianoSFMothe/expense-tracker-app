@@ -4,7 +4,8 @@ import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { verticalScale } from "@/utils/styling";
 import React from "react";
-import { Animated, Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 export default function Welcome() {
   return (
@@ -16,7 +17,8 @@ export default function Welcome() {
             <Typo>Entrar</Typo>
           </TouchableOpacity>
 
-          <Image
+          <Animated.Image
+            entering={FadeIn.duration(1000)}
             source={require("../../assets/images/welcome.png")}
             style={styles.welcomeImage}
             resizeMode="contain"
@@ -25,31 +27,42 @@ export default function Welcome() {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <View style={{ alignItems: "center" }}>
+          <Animated.View
+            entering={FadeIn.duration(1000).springify().damping(12)}
+            style={{ alignItems: "center" }}
+          >
             <Typo size={25} fontWeight={"800"}>
               Sempre assuma o controle
             </Typo>
             <Typo size={25} fontWeight={"800"}>
               de suas finanças
             </Typo>
-          </View>
+          </Animated.View>
 
-          <View style={{ alignItems: "center", gap: 2 }}>
-            <Typo size={15} color={colors.textLight}>
+          <Animated.View
+            entering={FadeIn.duration(1000).delay(100).springify().damping(12)}
+            style={{ alignItems: "center", gap: 2 }}
+          >
+            <Typo
+              size={15}
+              color={colors.textLight}
+              style={{ textAlign: "center" }}
+            >
               As finanças devem ser organizadas para estabelecer um melhor
-            </Typo>
-            <Typo size={15} color={colors.textLight}>
               estilo de vida no futuro
             </Typo>
-          </View>
+          </Animated.View>
 
-          <View style={styles.buttonContainer}>
+          <Animated.View
+            entering={FadeIn.duration(1000).delay(200).springify().damping(12)}
+            style={styles.buttonContainer}
+          >
             <Button>
               <Typo size={20} color={colors.neutral900} fontWeight={"600"}>
                 Comece Agora
               </Typo>
             </Button>
-          </View>
+          </Animated.View>
         </View>
       </View>
     </ScreenWrapper>
