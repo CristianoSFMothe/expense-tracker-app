@@ -1,4 +1,4 @@
-import { AuthProvider } from "@/contexts/authContexte";
+import { AuthProvider } from "@/contexts/authContext";
 import { Stack } from "expo-router";
 import React from "react";
 import { StyleSheet } from "react-native";
