@@ -4,6 +4,7 @@ import Input from "@/components/Input";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
+import { useAuth } from "@/contexts/authContexte";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
@@ -16,6 +17,7 @@ const Register = () => {
   const passwordRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { register: registerUser } = useAuth();
 
   const handleSubmit = async () => {
     if (!nameRef.current || !emailRef.current || !passwordRef.current) {
@@ -23,10 +25,21 @@ const Register = () => {
       return;
     }
 
-    console.log("nome", nameRef.current);
-    console.log("e-mail", emailRef.current);
-    console.log("password", passwordRef.current);
-    console.log("Entrou");
+    setIsLoading(true);
+
+    const response = await registerUser(
+      emailRef.current,
+      passwordRef.current,
+      nameRef.current,
+    );
+
+    setIsLoading(false);
+
+    console.log("response", response);
+
+    if (!response.success) {
+      Alert.alert("Cadastrar", response.msg);
+    }
   };
 
   return (
