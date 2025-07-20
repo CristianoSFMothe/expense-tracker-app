@@ -17,6 +17,10 @@ const Home = () => {
 
   console.log("user", user);
 
+  const handleLogout = async () => {
+    await signOut(auth);
+  };
+
   return (
     <ScreenWrapper>
       <Typo>Home</Typo>
