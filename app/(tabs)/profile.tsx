@@ -3,13 +3,44 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
+import { getProfileImage } from "@/services/imageService";
+import { accountOptionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
-import { Image } from "expo-image"; // Usando expo-image, assumindo que foi instalado
+import { Image } from "expo-image";
+import * as Icons from "phosphor-react-native";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 const Profile = () => {
   const { user } = useAuth();
+
+  const accountOptionType: accountOptionType[] = [
+    {
+      title: "Editar Perfil",
+      icon: <Icons.UserIcon size={26} color={colors.white} weight="fill" />,
+      routeName: "/(modls)/profileModal",
+      bgColor: "#6366F1",
+    },
+    {
+      title: "Configurações",
+      icon: <Icons.GearSixIcon size={26} color={colors.white} weight="fill" />,
+      // routeName: "/(modls)/profileModal",
+      bgColor: "#059669",
+    },
+    {
+      title: "Políticas de Privacidade",
+      icon: <Icons.LockIcon size={26} color={colors.white} weight="fill" />,
+      // routeName: "/(modls)/profileModal",
+      bgColor: colors.neutral600,
+    },
+    {
+      title: "Sair da Conta",
+      icon: <Icons.PowerIcon size={26} color={colors.white} weight="fill" />,
+      // routeName: "/(modls)/profileModal",
+      bgColor: "#E11d48",
+    },
+  ];
 
   return (
     <ScreenWrapper>
@@ -21,7 +52,7 @@ const Profile = () => {
           {/* Avatar */}
           <View>
             <Image
-              source={user?.image}
+              source={getProfileImage(user?.image)}
               style={styles.avatar}
               contentFit="cover"
               transition={100}
@@ -38,6 +69,42 @@ const Profile = () => {
               {user?.email}
             </Typo>
           </View>
+        </View>
+        {/* Account Options */}
+        <View style={styles.accountOptions}>
+          {accountOptionType.map((item, index) => {
+            return (
+              <Animated.View
+                entering={FadeInDown.delay(index * 50)
+                  .springify()
+                  .damping(14)}
+                style={styles.listItem}
+                key={index.toString()}
+              >
+                <TouchableOpacity style={styles.flexRow}>
+                  {/* icon */}
+                  <View
+                    style={[
+                      styles.listIcon,
+                      {
+                        backgroundColor: item?.bgColor,
+                      },
+                    ]}
+                  >
+                    {item.icon && item.icon}
+                  </View>
+                  <Typo size={16} style={{ flex: 1 }} fontWeight={"500"}>
+                    {item.title}
+                  </Typo>
+                  <Icons.CaretRightIcon
+                    size={verticalScale(20)}
+                    weight="bold"
+                    color={colors.white}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          })}
         </View>
       </View>
     </ScreenWrapper>
@@ -97,7 +164,6 @@ const styles = StyleSheet.create({
   listIcon: {
     height: verticalScale(44),
     width: verticalScale(44),
-
     backgroundColor: colors.neutral500,
     alignItems: "center",
     justifyContent: "center",
