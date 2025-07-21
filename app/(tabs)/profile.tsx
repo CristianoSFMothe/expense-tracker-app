@@ -8,6 +8,7 @@ import { getProfileImage } from "@/services/imageService";
 import { accountOptionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import * as Icons from "phosphor-react-native";
 import React from "react";
@@ -16,12 +17,13 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 const Profile = () => {
   const { user } = useAuth();
+  const router = useRouter();
 
   const accountOptionType: accountOptionType[] = [
     {
       title: "Editar Perfil",
       icon: <Icons.UserIcon size={26} color={colors.white} weight="fill" />,
-      routeName: "/(modls)/profileModal",
+      routeName: "/(modals)/profileModal",
       bgColor: "#6366F1",
     },
     {
@@ -67,6 +69,8 @@ const Profile = () => {
     if (item.title === "Sair da Conta") {
       showLogoutAlert();
     }
+
+    if (item.routeName) router.push(item.routeName);
   };
 
   return (
