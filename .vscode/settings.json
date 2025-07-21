@@ -8,5 +8,6 @@
     "firestore",
     "Pressable",
     "springify"
-  ]
+  ],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }
