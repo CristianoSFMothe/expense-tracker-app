@@ -87,15 +87,27 @@ const ProfileModal = () => {
 
         {/* Form */}
         <ScrollView contentContainerStyle={styles.form}>
-          <View style={styles.avatarContainer}>
+          <View
+            style={styles.avatarContainer}
+            accessible={true}
+            accessibilityLabel="Foto de perfil"
+            testID="avatar-container"
+          >
             <Image
               style={styles.avatar}
               source={getProfileImage(userData.image)}
               contentFit="cover"
               transition={100}
+              accessibilityLabel="Imagem do usuário"
+              testID="profile-image"
             />
 
-            <TouchableOpacity onPress={onPickImage} style={styles.editIcon}>
+            <TouchableOpacity
+              onPress={onPickImage}
+              style={styles.editIcon}
+              accessibilityLabel="Botão para editar imagem"
+              testID="edit-image-button"
+            >
               <Icons.PencilIcon
                 size={verticalScale(20)}
                 color={colors.neutral800}
@@ -103,7 +115,12 @@ const ProfileModal = () => {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.inputContainer}>
+          <View
+            style={styles.inputContainer}
+            accessible={true}
+            accessibilityLabel="Campo de nome"
+            testID="input-name-container"
+          >
             <Typo color={colors.neutral200}>Nome</Typo>
             <Input
               placeholder="Nome"
@@ -111,13 +128,21 @@ const ProfileModal = () => {
               onChangeText={(value) =>
                 setUserData({ ...userData, name: value })
               }
+              accessibilityLabel="Input Nome"
+              testID="input-name"
             />
           </View>
         </ScrollView>
       </View>
 
       <View style={styles.footer}>
-        <Button onPress={onSubmit} style={{ flex: 1 }} loading={isLoading}>
+        <Button
+          onPress={onSubmit}
+          style={{ flex: 1 }}
+          loading={isLoading}
+          accessibilityLabel="Botão Atualizar"
+          testID="submit-button"
+        >
           <Typo color={colors.black} fontWeight={"700"}>
             Atualizar
           </Typo>
@@ -134,7 +159,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     paddingHorizontal: spacingY._20,
-    // paddingVertical: spacingY._30,
   },
   footer: {
     alignItems: "center",
@@ -163,8 +187,6 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     borderWidth: 1,
     borderColor: colors.neutral500,
-    // overflow: "hidden",
-    // position: "relative",
   },
   editIcon: {
     position: "absolute",

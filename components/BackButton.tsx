@@ -13,6 +13,9 @@ const BackButton = ({ style, iconSize = 26 }: BackButtonProps) => {
     <TouchableOpacity
       onPress={() => router.back()}
       style={[styles.button, style]}
+      accessible={true}
+      accessibilityLabel="back button"
+      testID="back-button"
     >
       <CaretLeftIcon
         size={verticalScale(iconSize)}
