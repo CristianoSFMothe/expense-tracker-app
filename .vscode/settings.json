@@ -5,8 +5,11 @@
     "source.sortMembers": "explicit"
   },
   "cSpell.words": [
+    "Fech",
     "firestore",
     "Pressable",
-    "springify"
-  ]
+    "springify",
+    "unsub"
+  ],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }

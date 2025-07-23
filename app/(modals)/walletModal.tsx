@@ -7,21 +7,34 @@ import ModalWrapper from "@/components/ModalWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
-import { createOrUpdateWallet } from "@/services/walletService";
+import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
 import { WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Icons from "phosphor-react-native";
+import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
 
 const WalletModal = () => {
   const { user, updateUserData } = useAuth();
   const router = useRouter();
 
+  const oldWallet: { name: string; image: string; id: string } =
+    useLocalSearchParams();
+
   const [wallet, setWallet] = useState<WalletType>({
     name: "",
     image: null,
   });
+
+  useEffect(() => {
+    if (oldWallet?.id) {
+      setWallet({
+        name: oldWallet.name,
+        image: oldWallet.image,
+      });
+    }
+  }, []);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +52,7 @@ const WalletModal = () => {
       uid: user?.uid,
     };
 
-    // TODO: incluir id da carteira se estiver atualizando
+    if (oldWallet?.id) data.id = oldWallet?.id;
 
     setIsLoading(true);
 
@@ -56,11 +69,46 @@ const WalletModal = () => {
     }
   };
 
+  const onDelete = async () => {
+    if (!oldWallet?.id) return;
+
+    setIsLoading(true);
+
+    const response = await deleteWallet(oldWallet?.id);
+
+    setIsLoading(false);
+
+    if (response.success) {
+      router.back();
+    } else {
+      Alert.alert("Carteira", response.msg || "Erro ao deletar carteira");
+    }
+  };
+
+  const showDeleteAlert = () => {
+    Alert.alert(
+      "Confirmação",
+      "Tem certeza de que deseja fazer isso? \nEsta ação removerá todas as transações relacionadas a esta carteira.",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel",
+        },
+        {
+          text: "Confirmar",
+          onPress: () => onDelete(),
+          style: "destructive",
+        },
+      ],
+    );
+  };
+
   return (
     <ModalWrapper style={styles.container}>
       <View style={styles.container}>
         <Header
-          title="Nova carteira"
+          title={oldWallet?.id ? "Editar carteira" : "Nova carteira"}
           leftIcon={<BackButton />}
           style={{ marginBottom: spacingY._10 }}
         />
@@ -102,6 +150,21 @@ const WalletModal = () => {
       </View>
 
       <View style={styles.footer}>
+        {oldWallet?.id && !isLoading && (
+          <Button
+            onPress={showDeleteAlert}
+            style={{
+              backgroundColor: colors.rose,
+              paddingHorizontal: spacingX._15,
+            }}
+          >
+            <Icons.TrashIcon
+              color={colors.white}
+              size={verticalScale(24)}
+              weight="bold"
+            />
+          </Button>
+        )}
         <Button
           onPress={onSubmit}
           style={{ flex: 1 }}
@@ -110,7 +173,7 @@ const WalletModal = () => {
           testID="submit-button"
         >
           <Typo color={colors.black} fontWeight={"700"}>
-            Adicionar carteira
+            {oldWallet?.id ? "Atualizar carteira" : "Adicionar carteira"}
           </Typo>
         </Button>
       </View>
