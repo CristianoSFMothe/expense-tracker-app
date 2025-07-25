@@ -2,12 +2,14 @@ import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
 import ImageUpload from "@/components/ImageUpload";
+import Input from "@/components/Input";
 import ModalWrapper from "@/components/ModalWrapper";
 import Typo from "@/components/Typo";
 import { expenseCategories, transactionTypes } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFechData from "@/hooks/useFechData";
+import { createOrUpdateTransaction } from "@/services/transactionService";
 import { deleteWallet } from "@/services/walletService";
 import { TransactionType, WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
@@ -28,7 +30,7 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 
 const TransactionModal = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
@@ -65,27 +67,39 @@ const TransactionModal = () => {
   });
 
   const onSubmit = async () => {
-    // let { name, image } = transaction;
-    // if (!name.trim() || !image) {
-    //   Alert.alert("Carteira", "Por favor, preencha todos os campos.");
-    //   return;
-    // }
-    // const data: WalletType = {
-    //   name,
-    //   image,
-    //   uid: user?.uid,
-    // };
-    // if (oldTransaction?.id) data.id = oldTransaction?.id;
-    // setIsLoading(true);
-    // const response = await createOrUpdateWallet(data);
-    // setIsLoading(false);
-    // if (response.success) {
-    //   // TODO: Adicionar um toast como "Carteira criada com sucesso"
-    //   router.back();
-    // } else {
-    //   Alert.alert("Carteira", response.msg || "Erro ao criar carteira");
-    //   // TODO: Adicionar um toast de erro
-    // }
+    const { type, amount, description, category, date, walletId, image } =
+      transaction;
+
+    if (!walletId || !date || !amount || (type === "expense" && !category)) {
+      // TODO: trocar o Alert por um toast
+      Alert.alert("Transação", "Por favor, preencha todos os campos.");
+      return;
+    }
+
+    let transactionData: TransactionType = {
+      type,
+      amount,
+      category,
+      date,
+      walletId,
+      description,
+      image,
+      uid: user?.uid,
+    };
+
+    // TODO: include transaction id for update
+
+    setLoading(true);
+
+    const response = await createOrUpdateTransaction(transactionData);
+
+    setLoading(false);
+
+    if (response.success) {
+      router.back();
+    } else {
+      Alert.alert("Transação", response.msg);
+    }
   };
 
   const onDateChange = (event: any, selectDate: any) => {
@@ -93,17 +107,17 @@ const TransactionModal = () => {
 
     setTransaction({ ...transaction, date: currentDate });
 
-    setShowDatePicker(false);
+    setShowDatePicker(Platform.OS === "ios" ? true : false);
   };
 
   const onDelete = async () => {
     if (!oldTransaction?.id) return;
 
-    setIsLoading(true);
+    setLoading(true);
 
     const response = await deleteWallet(oldTransaction?.id);
 
-    setIsLoading(false);
+    setLoading(false);
 
     if (response.success) {
       router.back();
@@ -152,7 +166,9 @@ const TransactionModal = () => {
             accessibilityLabel="Campo de nome da carteira"
             // testID="input-name-container"
           >
-            <Typo color={colors.neutral200}>Tipo de transação</Typo>
+            <Typo color={colors.neutral200} size={16}>
+              Tipo de transação
+            </Typo>
 
             <Dropdown
               style={styles.dropdownContainer}
@@ -183,7 +199,9 @@ const TransactionModal = () => {
             accessibilityLabel="Campo de nome da carteira"
             // testID="input-name-container"
           >
-            <Typo color={colors.neutral200}>Carteira</Typo>
+            <Typo color={colors.neutral200} size={16}>
+              Carteira
+            </Typo>
 
             <Dropdown
               style={styles.dropdownContainer}
@@ -217,7 +235,9 @@ const TransactionModal = () => {
               accessibilityLabel="Campo de nome da carteira"
               // testID="input-name-container"
             >
-              <Typo color={colors.neutral200}>Categoria de despesa</Typo>
+              <Typo color={colors.neutral200} size={16}>
+                Categoria de despesa
+              </Typo>
 
               <Dropdown
                 style={styles.dropdownContainer}
@@ -251,7 +271,9 @@ const TransactionModal = () => {
             accessibilityLabel="Data de transação"
             testID="picker-date-container"
           >
-            <Typo color={colors.neutral200}>Data</Typo>
+            <Typo color={colors.neutral200} size={16}>
+              Data
+            </Typo>
             {!showDatePicker && (
               <Pressable
                 style={styles.dateInput}
@@ -270,7 +292,7 @@ const TransactionModal = () => {
                   value={transaction.date as Date}
                   textColor={colors.white}
                   mode="date"
-                  display="calendar"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
                   onChange={onDateChange}
                 />
 
@@ -288,13 +310,66 @@ const TransactionModal = () => {
             )}
           </View>
 
+          {/* Amount */}
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200} size={16}>
+              Quantidade
+            </Typo>
+            <Input
+              keyboardType="numeric"
+              value={transaction.amount.toString()}
+              onChangeText={(value) => {
+                setTransaction({
+                  ...transaction,
+                  amount: Number(value.replace(/[^0-9]/g, "")),
+                });
+              }}
+            />
+          </View>
+
+          {/* Description */}
+          <View style={styles.inputContainer}>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Descrição
+              </Typo>
+              <Typo color={colors.neutral500} size={14}>
+                (Opcional)
+              </Typo>
+            </View>
+            <Input
+              placeholder="Informe uma descrição"
+              value={transaction.description}
+              multiline
+              containerStyle={{
+                flexDirection: "row",
+                height: verticalScale(100),
+                alignItems: "flex-start",
+                paddingVertical: 15,
+              }}
+              onChangeText={(value) => {
+                setTransaction({
+                  ...transaction,
+                  description: value,
+                });
+              }}
+            />
+          </View>
+
           <View
             style={styles.inputContainer}
             accessible={true}
             // accessibilityLabel="Campo de nome da carteira"
             testID="input-name-container"
           >
-            <Typo color={colors.neutral200}>Transação ícone</Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Recibo
+              </Typo>
+              <Typo color={colors.neutral500} size={14}>
+                (Opcional)
+              </Typo>
+            </View>
             {/* Image input */}
             <ImageUpload
               file={transaction.image}
@@ -309,7 +384,7 @@ const TransactionModal = () => {
       </View>
 
       <View style={styles.footer}>
-        {oldTransaction?.id && !isLoading && (
+        {oldTransaction?.id && !loading && (
           <Button
             onPress={showDeleteAlert}
             style={{
@@ -327,12 +402,12 @@ const TransactionModal = () => {
         <Button
           onPress={onSubmit}
           style={{ flex: 1 }}
-          loading={isLoading}
+          loading={loading}
           accessibilityLabel="Botão Atualizar"
           testID="submit-button"
         >
           <Typo color={colors.black} fontWeight={"700"}>
-            {oldTransaction?.id ? "Atualizar transação" : "Adicionar transação"}
+            {oldTransaction?.id ? "Atualizar" : "Enviar"}
           </Typo>
         </Button>
       </View>

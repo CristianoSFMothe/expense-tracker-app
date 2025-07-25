@@ -4,8 +4,11 @@ import TransactionList from "@/components/TransactionList";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
+import useFechData from "@/hooks/useFechData";
+import { TransactionType } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import { useRouter } from "expo-router";
+import { limit, orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
 import React from "react";
 import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
@@ -14,6 +17,18 @@ import HomeCard from "./../../components/HomeCard";
 const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
+
+  const constraints = [
+    where("uid", "==", user?.uid),
+    orderBy("date", "desc"),
+    limit(30),
+  ];
+
+  const {
+    data: recentTransactions,
+    error,
+    loading: transactionLoading,
+  } = useFechData<TransactionType>("transactions", constraints);
 
   return (
     <ScreenWrapper>
@@ -47,8 +62,8 @@ const Home = () => {
           </View>
 
           <TransactionList
-            data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
-            loading={false}
+            data={recentTransactions}
+            loading={transactionLoading}
             emptyListMessage="Nenhuma transação encontrada"
             title="Transações recentes"
           />
