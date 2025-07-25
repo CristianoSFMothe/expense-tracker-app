@@ -12,7 +12,7 @@ import {
 const { height } = Dimensions.get("window");
 
 export default function ScreenWrapper({ style, children }: ScreenWrapperProps) {
-  let paddingTop = Platform.OS === "ios" ? height * 0.06 : 0;
+  let paddingTop = Platform.OS === "ios" ? height * 0.06 : 50;
   return (
     <View
       style={[
