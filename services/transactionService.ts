@@ -2,6 +2,7 @@ import { firestore } from "@/config/firebase";
 import { ResponseType, TransactionType, WalletType } from "@/types";
 import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { uploadFileToCloudinary } from "./imageService";
+import { createOrUpdateWallet } from "./walletService";
 
 export const createOrUpdateTransaction = async (
   transactionData: Partial<TransactionType>,
@@ -14,7 +15,26 @@ export const createOrUpdateTransaction = async (
     }
 
     if (id) {
-      // TODO: update transaction
+      const oldTransactionSnapshot = await getDoc(
+        doc(firestore, "transactions", id),
+      );
+      const oldTransaction = oldTransactionSnapshot.data() as TransactionType;
+      const shouldRevertOriginal =
+        oldTransaction.type !== type ||
+        oldTransaction.amount ||
+        oldTransaction.amount !== amount ||
+        oldTransaction.walletId !== walletId;
+
+      if (shouldRevertOriginal) {
+        let response = await revertAndUpdateWallets(
+          oldTransaction,
+          Number(amount),
+          type,
+          walletId,
+        );
+
+        if (!response.success) return response;
+      }
     } else {
       let response = await updateWalletForNewTransaction(
         walletId!,
@@ -97,6 +117,97 @@ const updateWalletForNewTransaction = async (
     await updateDoc(walletRef, {
       amount: updatedWalletAmount,
       [updatedType]: updatedTotals,
+    });
+
+    return { success: true };
+  } catch (error: any) {
+    console.log("Erro ao atualizar carteira para uma nova transação: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};
+
+const revertAndUpdateWallets = async (
+  oldTransaction: TransactionType,
+  newTransactionAmount: number,
+  newTransactionType: string,
+  newWalletId: string,
+) => {
+  try {
+    const originalWalletSnapshot = await getDoc(
+      doc(firestore, "wallets", oldTransaction.walletId),
+    );
+
+    const originalWallet = originalWalletSnapshot.data() as WalletType;
+
+    let newWalletSnapshot = await getDoc(
+      doc(firestore, "wallets", newWalletId),
+    );
+
+    let newWallet = newWalletSnapshot.data() as WalletType;
+
+    const revertType =
+      oldTransaction.type === "income" ? "totalIncome" : "totalExpenses";
+
+    const revertIncomeExpense: number =
+      oldTransaction.type === "income"
+        ? -Number(oldTransaction.amount)
+        : Number(oldTransaction.amount);
+
+    const revertWalletAmount =
+      Number(originalWallet.amount) + revertIncomeExpense;
+
+    const revertIncomeExpenseAmount =
+      Number(originalWallet[revertType]) - Number(oldTransaction.amount);
+
+    if (newTransactionType === "expense") {
+      if (
+        oldTransaction.walletId === newWalletId &&
+        revertWalletAmount < newTransactionAmount
+      ) {
+        return {
+          success: false,
+          msg: "A carteira selecionada não tem saldo suficiente!",
+        };
+      }
+
+      if (newWallet.amount! < newTransactionAmount) {
+        return {
+          success: false,
+          msg: "A carteira selecionada não tem saldo suficiente!",
+        };
+      }
+    }
+
+    await createOrUpdateWallet({
+      id: oldTransaction.walletId,
+      amount: revertWalletAmount,
+      [revertType]: revertIncomeExpenseAmount,
+    });
+
+    newWalletSnapshot = await getDoc(doc(firestore, "wallets", newWalletId));
+    newWallet = newWalletSnapshot.data() as WalletType;
+
+    const updateType =
+      newTransactionType === "income" ? "totalIncome" : "totalExpenses";
+
+    const updateTransactionAmount: number =
+      newTransactionType === "income"
+        ? Number(newTransactionAmount)
+        : -Number(newTransactionAmount);
+
+    const newWalletAmount = Number(newWallet.amount) + updateTransactionAmount;
+
+    const newIncomeExpenseAmount = Number(
+      newWallet[updateType]! + Number(newTransactionAmount),
+    );
+
+    await createOrUpdateWallet({
+      id: newWalletId,
+      amount: newWalletAmount,
+      [updateType]: newIncomeExpenseAmount,
     });
 
     return { success: true };
