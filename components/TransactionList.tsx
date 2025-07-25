@@ -1,6 +1,7 @@
 import { expenseCategories, incomeCategory } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { TransactionItemProps, TransactionListType } from "@/types";
+import { formatCurrency } from "@/utils/formatters";
 import { verticalScale } from "@/utils/styling";
 import { FlashList } from "@shopify/flash-list";
 import { Timestamp } from "firebase/firestore";
@@ -113,7 +114,9 @@ const TransactionItem = ({
             color={item?.type === "income" ? colors.primary : colors.rose}
             fontWeight={"500"}
           >
-            {`${item?.type === "income" ? "+ R$" : "- R$"}${item?.amount}`}
+            {`${item?.type === "income" ? "+ " : "- "}${formatCurrency(
+              item?.amount,
+            )}`}
           </Typo>
 
           <Typo size={13} color={colors.neutral400}>

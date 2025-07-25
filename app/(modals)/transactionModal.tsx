@@ -166,9 +166,14 @@ const TransactionModal = () => {
             accessibilityLabel="Campo de nome da carteira"
             // testID="input-name-container"
           >
-            <Typo color={colors.neutral200} size={16}>
-              Tipo de transação
-            </Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Tipo de transação
+              </Typo>
+              <Typo color={colors.neutral400} size={14}>
+                Selecionar o tipo de operação
+              </Typo>
+            </View>
 
             <Dropdown
               style={styles.dropdownContainer}
@@ -199,9 +204,14 @@ const TransactionModal = () => {
             accessibilityLabel="Campo de nome da carteira"
             // testID="input-name-container"
           >
-            <Typo color={colors.neutral200} size={16}>
-              Carteira
-            </Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Carteira
+              </Typo>
+              <Typo color={colors.neutral500} size={14}>
+                Selecione o tipo da carteira
+              </Typo>
+            </View>
 
             <Dropdown
               style={styles.dropdownContainer}
@@ -235,10 +245,6 @@ const TransactionModal = () => {
               accessibilityLabel="Campo de nome da carteira"
               // testID="input-name-container"
             >
-              <Typo color={colors.neutral200} size={16}>
-                Categoria de despesa
-              </Typo>
-
               <Dropdown
                 style={styles.dropdownContainer}
                 activeColor={colors.neutral700}
@@ -271,9 +277,14 @@ const TransactionModal = () => {
             accessibilityLabel="Data de transação"
             testID="picker-date-container"
           >
-            <Typo color={colors.neutral200} size={16}>
-              Data
-            </Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Data
+              </Typo>
+              <Typo color={colors.neutral500} size={14}>
+                Data da transação
+              </Typo>
+            </View>
             {!showDatePicker && (
               <Pressable
                 style={styles.dateInput}
@@ -312,9 +323,14 @@ const TransactionModal = () => {
 
           {/* Amount */}
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200} size={16}>
-              Quantidade
-            </Typo>
+            <View style={styles.flexRow}>
+              <Typo color={colors.neutral200} size={16}>
+                Quantidade
+              </Typo>
+              <Typo color={colors.neutral500} size={12}>
+                Valor da transação em R$
+              </Typo>
+            </View>
             <Input
               keyboardType="numeric"
               value={transaction.amount.toString()}

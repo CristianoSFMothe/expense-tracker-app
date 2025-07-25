@@ -2,6 +2,7 @@ import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFechData from "@/hooks/useFechData";
 import { WalletType } from "@/types";
+import { formatCurrency } from "@/utils/formatters";
 import { scale, verticalScale } from "@/utils/styling";
 import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
@@ -54,7 +55,9 @@ const HomeCard = () => {
             />
           </View>
           <Typo color={colors.black} size={30} fontWeight={"bold"}>
-            R$ {walletLoading ? "----" : getTotals().balance?.toFixed(2)}
+            {walletLoading
+              ? "----"
+              : formatCurrency(getTotals().balance?.toFixed(2))}
           </Typo>
         </View>
 
@@ -77,7 +80,9 @@ const HomeCard = () => {
 
             <View style={{ alignSelf: "center" }}>
               <Typo size={17} color={colors.green} fontWeight={"600"}>
-                R$ {walletLoading ? "----" : getTotals().income?.toFixed(2)}
+                {walletLoading
+                  ? "----"
+                  : formatCurrency(getTotals().income?.toFixed(2))}
               </Typo>
             </View>
           </View>
@@ -99,7 +104,9 @@ const HomeCard = () => {
 
             <View style={{ alignSelf: "center" }}>
               <Typo size={17} color={colors.rose} fontWeight={"600"}>
-                R$ {walletLoading ? "----" : getTotals().expenses?.toFixed(2)}
+                {walletLoading
+                  ? "----"
+                  : formatCurrency(getTotals().expenses?.toFixed(2))}
               </Typo>
             </View>
           </View>

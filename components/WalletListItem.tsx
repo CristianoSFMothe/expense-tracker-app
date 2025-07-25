@@ -1,5 +1,6 @@
 import { colors, radius, spacingX } from "@/constants/theme";
 import { WalletType } from "@/types";
+import { formatCurrency } from "@/utils/formatters";
 import { verticalScale } from "@/utils/styling";
 import { Image } from "expo-image";
 import { Router } from "expo-router";
@@ -47,7 +48,7 @@ const WalletListItem = ({
         <View style={styles.nameContainer}>
           <Typo size={16}>{item?.name}</Typo>
           <Typo size={14} color={colors.neutral400}>
-            R$ {item?.amount}
+            {formatCurrency(item?.amount || 0)}
           </Typo>
         </View>
 
