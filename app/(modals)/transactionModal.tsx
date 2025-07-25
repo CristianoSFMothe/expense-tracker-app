@@ -11,15 +11,25 @@ import useFechData from "@/hooks/useFechData";
 import { deleteWallet } from "@/services/walletService";
 import { TransactionType, WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { orderBy, where } from "firebase/firestore";
 import * as Icons from "phosphor-react-native";
 import React, { useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Alert,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 const TransactionModal = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const { user } = useAuth();
   const router = useRouter();
 
@@ -76,6 +86,14 @@ const TransactionModal = () => {
     //   Alert.alert("Carteira", response.msg || "Erro ao criar carteira");
     //   // TODO: Adicionar um toast de erro
     // }
+  };
+
+  const onDateChange = (event: any, selectDate: any) => {
+    const currentDate = selectDate || transaction.date;
+
+    setTransaction({ ...transaction, date: currentDate });
+
+    setShowDatePicker(false);
   };
 
   const onDelete = async () => {
@@ -227,6 +245,48 @@ const TransactionModal = () => {
           )}
 
           {/* date picker */}
+          <View
+            style={styles.inputContainer}
+            accessible={true}
+            accessibilityLabel="Data de transação"
+            testID="picker-date-container"
+          >
+            <Typo color={colors.neutral200}>Data</Typo>
+            {!showDatePicker && (
+              <Pressable
+                style={styles.dateInput}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Typo size={14}>
+                  {(transaction.date as Date).toLocaleDateString()}
+                </Typo>
+              </Pressable>
+            )}
+
+            {showDatePicker && (
+              <View style={Platform.OS === "ios" && styles.iosDatePicker}>
+                <DateTimePicker
+                  themeVariant="dark"
+                  value={transaction.date as Date}
+                  textColor={colors.white}
+                  mode="date"
+                  display="calendar"
+                  onChange={onDateChange}
+                />
+
+                {Platform.OS === "ios" && (
+                  <TouchableOpacity
+                    style={styles.datePickerButton}
+                    onPress={() => setShowDatePicker(false)}
+                  >
+                    <Typo size={15} fontWeight={"500"}>
+                      OK
+                    </Typo>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
 
           <View
             style={styles.inputContainer}
