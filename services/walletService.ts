@@ -1,6 +1,15 @@
 import { firestore } from "@/config/firebase";
 import { ResponseType, WalletType } from "@/types";
-import { collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+  writeBatch,
+} from "firebase/firestore";
 import { uploadFileToCloudinary } from "./imageService";
 
 export const createOrUpdateWallet = async (
@@ -55,11 +64,49 @@ export const deleteWallet = async (walletId: string): Promise<ResponseType> => {
 
     await deleteDoc(walletRef);
 
-    // TODO: delete all transactions
+    deleteTransactionByWalletId(walletId);
 
     return { success: true, msg: "Carteira deletada com sucesso" };
   } catch (error: any) {
     console.log("Erro ao deletar carteira: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};
+
+export const deleteTransactionByWalletId = async (
+  walletId: string,
+): Promise<ResponseType> => {
+  try {
+    let hasMoreTransaction = true;
+
+    while (hasMoreTransaction) {
+      const transactionsQuery = query(
+        collection(firestore, "transactions"),
+        where("walletId", "==", walletId),
+      );
+
+      const transactionSnapshot = await getDocs(transactionsQuery);
+
+      if (transactionSnapshot.size === 0) {
+        hasMoreTransaction = false;
+        break;
+      }
+
+      const batch = writeBatch(firestore);
+
+      transactionSnapshot.forEach((transactionDoc) => {
+        batch.delete(transactionDoc.ref);
+      });
+
+      await batch.commit();
+    }
+
+    return { success: true, msg: "Todas as transações deletadas com sucesso" };
+  } catch (error: any) {
+    console.log("Erro ao deletar transações: ", error);
     return {
       success: false,
       msg: error.message,
