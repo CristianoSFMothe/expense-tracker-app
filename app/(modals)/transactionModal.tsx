@@ -66,7 +66,7 @@ const TransactionModal = () => {
         category: oldTransaction.category || "",
         date: new Date(oldTransaction.date),
         walletId: oldTransaction.walletId,
-        image: oldTransaction?.image,
+        image: oldTransaction?.image || null,
       });
     }
   }, []);
@@ -102,7 +102,7 @@ const TransactionModal = () => {
       uid: user?.uid,
     };
 
-    if (oldTransaction?.id) transaction.id = oldTransaction?.id;
+    if (oldTransaction?.id) transactionData.id = oldTransaction?.id;
 
     setLoading(true);
 
