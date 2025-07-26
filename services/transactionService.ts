@@ -1,12 +1,20 @@
 import { firestore } from "@/config/firebase";
+import { colors } from "@/constants/theme";
 import { ResponseType, TransactionType, WalletType } from "@/types";
+import { getLastSevenDays } from "@/utils/common";
+import { scale } from "@/utils/styling";
 import {
   collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  orderBy,
+  query,
   setDoc,
+  Timestamp,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { uploadFileToCloudinary } from "./imageService";
 import { createOrUpdateWallet } from "./walletService";
@@ -274,6 +282,76 @@ export const deleteTransaction = async (
     return { success: true };
   } catch (error: any) {
     console.log("Erro ao deletar transação: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};
+
+export const fetchWeeklyStats = async (uid: string): Promise<ResponseType> => {
+  try {
+    const db = firestore;
+    const today = new Date();
+    const sevenDayAgo = new Date(today);
+    sevenDayAgo.setDate(today.getDate() - 7);
+
+    const transactionQuery = query(
+      collection(db, "transactions"),
+      where("date", ">=", Timestamp.fromDate(sevenDayAgo)),
+      where("date", "<=", Timestamp.fromDate(today)),
+      orderBy("date", "asc"),
+      where("uid", "==", uid),
+    );
+
+    const querySnapshot = await getDocs(transactionQuery);
+    const weeklyData = getLastSevenDays();
+    const transactions: TransactionType[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data() as TransactionType;
+      transaction.id = doc.id;
+      transactions.push(transaction);
+
+      const transactionDate = (transaction.date as Timestamp)
+        .toDate()
+        .toISOString()
+        .split("T")[0];
+
+      const dayData = weeklyData.find((day) => day.date === transactionDate);
+
+      if (dayData) {
+        if (transaction.type === "income") {
+          dayData.income += transaction.amount;
+        } else if (transaction.type === "expense") {
+          dayData.expense += transaction.amount;
+        }
+      }
+    });
+
+    const stats = weeklyData.flatMap((day) => [
+      {
+        value: day.income,
+        label: day.day,
+        spacing: scale(4),
+        labelWidth: scale(30),
+        frontColor: colors.primary,
+      },
+      {
+        value: day.expense,
+        frontColor: colors.rose,
+      },
+    ]);
+
+    return {
+      success: true,
+      data: {
+        stats,
+        transactions,
+      },
+    };
+  } catch (error: any) {
+    console.log("Erro ao buscar estatísticas semanais: ", error);
     return {
       success: false,
       msg: error.message,
