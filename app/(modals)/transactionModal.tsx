@@ -9,8 +9,10 @@ import { expenseCategories, transactionTypes } from "@/constants/data";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import useFechData from "@/hooks/useFechData";
-import { createOrUpdateTransaction } from "@/services/transactionService";
-import { deleteWallet } from "@/services/walletService";
+import {
+  createOrUpdateTransaction,
+  deleteTransaction,
+} from "@/services/transactionService";
 import { TransactionType, WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -98,7 +100,7 @@ const TransactionModal = () => {
       date,
       walletId,
       description,
-      image,
+      image: image ? image : null,
       uid: user?.uid,
     };
 
@@ -130,21 +132,24 @@ const TransactionModal = () => {
 
     setLoading(true);
 
-    const response = await deleteWallet(oldTransaction?.id);
+    const response = await deleteTransaction(
+      oldTransaction?.id,
+      oldTransaction.walletId,
+    );
 
     setLoading(false);
 
     if (response.success) {
       router.back();
     } else {
-      Alert.alert("Carteira", response.msg || "Erro ao deletar carteira");
+      Alert.alert("Transação", response.msg || "Erro ao deletar transação");
     }
   };
 
   const showDeleteAlert = () => {
     Alert.alert(
       "Confirmação",
-      "Tem certeza de que deseja fazer isso? \nEsta ação removerá todas as transações relacionadas a esta carteira.",
+      "Tem certeza de que deseja excluir essa transação?",
       [
         {
           text: "Cancelar",

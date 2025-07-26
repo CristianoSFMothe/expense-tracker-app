@@ -1,6 +1,13 @@
 import { firestore } from "@/config/firebase";
 import { ResponseType, TransactionType, WalletType } from "@/types";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { uploadFileToCloudinary } from "./imageService";
 import { createOrUpdateWallet } from "./walletService";
 
@@ -213,6 +220,60 @@ const revertAndUpdateWallets = async (
     return { success: true };
   } catch (error: any) {
     console.log("Erro ao atualizar carteira para uma nova transação: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};
+
+export const deleteTransaction = async (
+  transactionId: string,
+  walletId: string,
+) => {
+  try {
+    const transactionRef = doc(firestore, "transactions", transactionId);
+
+    const transactionSnapshot = await getDoc(transactionRef);
+
+    if (!transactionSnapshot.exists()) {
+      return { success: false, msg: "Transação nao encontrada!" };
+    }
+
+    const transactionData = transactionSnapshot.data() as TransactionType;
+
+    const transactionType = transactionData?.type;
+    const transactionAmount = transactionData?.amount;
+
+    const walletSnapshot = await getDoc(doc(firestore, "wallets", walletId));
+    const walletData = walletSnapshot.data() as WalletType;
+
+    const updateType =
+      transactionType === "income" ? "totalIncome" : "totalExpenses";
+    const newWalletAmount =
+      walletData?.amount! -
+      (transactionType === "income" ? transactionAmount : -transactionAmount);
+
+    const newIncomeExpenseAmount = walletData[updateType]! - transactionAmount;
+
+    if (transactionType === "expense" && newWalletAmount < 0) {
+      return {
+        success: false,
+        msg: "Você não pode excluir esta transação!",
+      };
+    }
+
+    await createOrUpdateWallet({
+      id: walletId,
+      amount: newWalletAmount,
+      [updateType]: newIncomeExpenseAmount,
+    });
+
+    await deleteDoc(transactionRef);
+
+    return { success: true };
+  } catch (error: any) {
+    console.log("Erro ao deletar transação: ", error);
     return {
       success: false,
       msg: error.message,
