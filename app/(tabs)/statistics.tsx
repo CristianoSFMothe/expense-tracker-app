@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/authContext";
 import {
   fetchMonthlyStats,
   fetchWeeklyStats,
+  fetchYearlyStats,
 } from "@/services/transactionService";
 import { scale, verticalScale } from "@/utils/styling";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
@@ -65,7 +66,20 @@ const Statistics = () => {
     }
   };
 
-  const getYearlyStats = async () => {};
+  const getYearlyStats = async () => {
+    setChartLoading(true);
+
+    let response = await fetchYearlyStats(user?.uid as string);
+
+    setChartLoading(false);
+    setTransactions(response?.data?.transactions);
+
+    if (response.success) {
+      setChartData(response?.data?.stats);
+    } else {
+      Alert.alert("Estadísticas", response.msg);
+    }
+  };
 
   return (
     <ScreenWrapper>

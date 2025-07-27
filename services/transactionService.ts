@@ -4,6 +4,7 @@ import { ResponseType, TransactionType, WalletType } from "@/types";
 import {
   getLastSevenDays,
   getLastTwelveMonths,
+  getYearsRange,
   monthsOfYear,
 } from "@/utils/common";
 import { scale } from "@/utils/styling";
@@ -429,6 +430,82 @@ export const fetchMonthlyStats = async (uid: string): Promise<ResponseType> => {
     return {
       success: false,
       msg: error.message,
+    };
+  }
+};
+
+export const fetchYearlyStats = async (uid: string): Promise<ResponseType> => {
+  try {
+    const db = firestore;
+
+    const transactionQuery = query(
+      collection(db, "transactions"),
+      orderBy("date", "desc"),
+      where("uid", "==", uid),
+    );
+
+    const querySnapshot = await getDocs(transactionQuery);
+    const transactions: TransactionType[] = [];
+
+    const firsTransaction = querySnapshot.docs.reduce((earliest, doc) => {
+      const transactionDate = doc.data().date.toDate();
+
+      return transactionDate < earliest ? transactionDate : earliest;
+    }, new Date());
+
+    const firstYear = firsTransaction.getFullYear();
+    const currentYear = new Date().getFullYear();
+
+    const yearlyData = getYearsRange(firstYear, currentYear);
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data() as TransactionType;
+      transaction.id = doc.id;
+      transactions.push(transaction);
+
+      const transactionYear = (transaction.date as Timestamp)
+        .toDate()
+        .getFullYear();
+
+      const yearData = yearlyData.find(
+        (item: any) => item.year === transactionYear.toString(),
+      );
+
+      if (yearData) {
+        if (transaction.type === "income") {
+          yearData.income += transaction.amount;
+        } else if (transaction.type === "expense") {
+          yearData.expense += transaction.amount;
+        }
+      }
+    });
+
+    const stats = yearlyData.flatMap((year: any) => [
+      {
+        value: year.income,
+        label: year.year,
+        spacing: scale(4),
+        labelWidth: scale(35),
+        frontColor: colors.primary,
+      },
+      {
+        value: year.expense,
+        frontColor: colors.rose,
+      },
+    ]);
+
+    return {
+      success: true,
+      data: {
+        stats,
+        transactions,
+      },
+    };
+  } catch (error: any) {
+    console.log("Erro ao buscar estatísticas anuais: ", error);
+    return {
+      success: false,
+      msg: "Erro ao buscar estatísticas anuais: ",
     };
   }
 };
