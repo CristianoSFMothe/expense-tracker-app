@@ -1,5 +1,7 @@
 import Header from "@/components/Header";
+import Loading from "@/components/Loading";
 import ScreenWrapper from "@/components/ScreenWrapper";
+import TransactionList from "@/components/TransactionList";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import { fetchWeeklyStats } from "@/services/transactionService";
@@ -13,7 +15,8 @@ const Statistics = () => {
   const { user } = useAuth();
   const [activeIndex, setActiveIndex] = useState(0);
   const [chartData, setChartData] = useState([]);
-  const [chatLoading, setChartLoading] = useState(false);
+  const [chartLoading, setChartLoading] = useState(false);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     if (activeIndex === 0) {
@@ -35,6 +38,7 @@ const Statistics = () => {
     let response = await fetchWeeklyStats(user?.uid as string);
 
     setChartLoading(false);
+    setTransactions(response?.data?.transactions);
 
     if (response.success) {
       setChartData(response?.data?.stats);
@@ -104,6 +108,21 @@ const Statistics = () => {
             ) : (
               <View style={styles.noChar} />
             )}
+
+            {chartLoading && (
+              <View style={styles.chartLoadingContainer}>
+                <Loading color={colors.white} />
+              </View>
+            )}
+          </View>
+
+          {/* Transactions */}
+          <View>
+            <TransactionList
+              title="Transações"
+              emptyListMessage="Nenhuma transação encontrada"
+              data={transactions}
+            />
           </View>
         </ScrollView>
       </View>
