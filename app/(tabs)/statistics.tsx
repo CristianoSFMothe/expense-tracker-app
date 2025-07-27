@@ -4,7 +4,10 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import TransactionList from "@/components/TransactionList";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
-import { fetchWeeklyStats } from "@/services/transactionService";
+import {
+  fetchMonthlyStats,
+  fetchWeeklyStats,
+} from "@/services/transactionService";
 import { scale, verticalScale } from "@/utils/styling";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import React, { useEffect, useState } from "react";
@@ -47,7 +50,20 @@ const Statistics = () => {
     }
   };
 
-  const getMonthlyStats = async () => {};
+  const getMonthlyStats = async () => {
+    setChartLoading(true);
+
+    let response = await fetchMonthlyStats(user?.uid as string);
+
+    setChartLoading(false);
+    setTransactions(response?.data?.transactions);
+
+    if (response.success) {
+      setChartData(response?.data?.stats);
+    } else {
+      Alert.alert("Estadísticas", response.msg);
+    }
+  };
 
   const getYearlyStats = async () => {};
 

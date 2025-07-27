@@ -1,7 +1,11 @@
 import { firestore } from "@/config/firebase";
 import { colors } from "@/constants/theme";
 import { ResponseType, TransactionType, WalletType } from "@/types";
-import { getLastSevenDays } from "@/utils/common";
+import {
+  getLastSevenDays,
+  getLastTwelveMonths,
+  monthsOfYear,
+} from "@/utils/common";
 import { scale } from "@/utils/styling";
 import {
   collection,
@@ -300,7 +304,7 @@ export const fetchWeeklyStats = async (uid: string): Promise<ResponseType> => {
       collection(db, "transactions"),
       where("date", ">=", Timestamp.fromDate(sevenDayAgo)),
       where("date", "<=", Timestamp.fromDate(today)),
-      orderBy("date", "asc"),
+      orderBy("date", "desc"),
       where("uid", "==", uid),
     );
 
@@ -352,6 +356,76 @@ export const fetchWeeklyStats = async (uid: string): Promise<ResponseType> => {
     };
   } catch (error: any) {
     console.log("Erro ao buscar estatísticas semanais: ", error);
+    return {
+      success: false,
+      msg: error.message,
+    };
+  }
+};
+
+export const fetchMonthlyStats = async (uid: string): Promise<ResponseType> => {
+  try {
+    const db = firestore;
+    const today = new Date();
+    const twelveMonthsAgo = new Date(today);
+    twelveMonthsAgo.setMonth(today.getMonth() - 12);
+
+    const transactionQuery = query(
+      collection(db, "transactions"),
+      where("date", ">=", Timestamp.fromDate(twelveMonthsAgo)),
+      where("date", "<=", Timestamp.fromDate(today)),
+      orderBy("date", "desc"),
+      where("uid", "==", uid),
+    );
+
+    const querySnapshot = await getDocs(transactionQuery);
+    const monthlyDate = getLastTwelveMonths();
+    const transactions: TransactionType[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data() as TransactionType;
+      transaction.id = doc.id;
+      transactions.push(transaction);
+
+      const transactionDate = (transaction.date as Timestamp).toDate();
+      const monthName = monthsOfYear[transactionDate.getMonth()];
+      const shortYear = transactionDate.getFullYear().toString().slice(-2);
+      const monthData = monthlyDate.find(
+        (month) => month.month === `${monthName} ${shortYear}`,
+      );
+
+      if (monthData) {
+        if (transaction.type === "income") {
+          monthData.income += transaction.amount;
+        } else if (transaction.type === "expense") {
+          monthData.expense += transaction.amount;
+        }
+      }
+    });
+
+    const stats = monthlyDate.flatMap((month) => [
+      {
+        value: month.income,
+        label: month.month,
+        spacing: scale(4),
+        labelWidth: scale(46),
+        frontColor: colors.primary,
+      },
+      {
+        value: month.expense,
+        frontColor: colors.rose,
+      },
+    ]);
+
+    return {
+      success: true,
+      data: {
+        stats,
+        transactions,
+      },
+    };
+  } catch (error: any) {
+    console.log("Erro ao buscar estatísticas mensais: ", error);
     return {
       success: false,
       msg: error.message,

@@ -16,3 +16,41 @@ export const getLastSevenDays = () => {
 
   return result.reverse();
 };
+
+export const monthsOfYear = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+];
+
+export const getLastTwelveMonths = () => {
+  const result = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const date = new Date();
+    date.setMonth(date.getMonth() - i);
+
+    const monthName = monthsOfYear[date.getMonth()];
+    const shortYear = date.getFullYear().toString().slice(-2);
+    const formattedMonthYear = `${monthName} ${shortYear}`;
+    const formatterDate = date.toISOString().split("T")[0];
+
+    result.push({
+      month: formattedMonthYear,
+      fullDate: formatterDate,
+      income: 0,
+      expense: 0,
+    });
+  }
+
+  return result.reverse();
+};
