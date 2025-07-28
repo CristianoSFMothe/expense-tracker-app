@@ -26,16 +26,16 @@ const Profile = () => {
       routeName: "/(modals)/profileModal",
       bgColor: "#6366F1",
     },
-    {
-      title: "Configurações",
-      icon: <Icons.GearSixIcon size={26} color={colors.white} weight="fill" />,
-      // routeName: "/(modls)/profileModal",
-      bgColor: "#059669",
-    },
+    // {
+    //   title: "Configurações",
+    //   icon: <Icons.GearSixIcon size={26} color={colors.white} weight="fill" />,
+    //   routeName: "/(modals)/profileModal",
+    //   bgColor: "#059669",
+    // },
     {
       title: "Políticas de Privacidade",
       icon: <Icons.LockIcon size={26} color={colors.white} weight="fill" />,
-      // routeName: "/(modls)/profileModal",
+      // routeName: "/(modals)/profileModal",
       bgColor: colors.neutral600,
     },
     {
