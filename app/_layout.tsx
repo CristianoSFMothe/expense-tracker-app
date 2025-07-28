@@ -33,6 +33,13 @@ const StackLayout = () => {
           presentation: "modal",
         }}
       />
+
+      <Stack.Screen
+        name="(modals)/privacyPolicyModal"
+        options={{
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 };
