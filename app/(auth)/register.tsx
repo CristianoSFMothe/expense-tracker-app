@@ -5,37 +5,39 @@ import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
+import { registerSchema, RegisterSchemaType } from "@/schemas/registerSchema";
 import { verticalScale } from "@/utils/styling";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
 
 const Register = () => {
-  const nameRef = useRef("");
-  const emailRef = useRef("");
-  const passwordRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { register: registerUser } = useAuth();
 
-  const handleSubmit = async () => {
-    if (!nameRef.current || !emailRef.current || !passwordRef.current) {
-      Alert.alert("Cadastrar", "Por favor, preencha todos os campos.");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterSchemaType>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
 
+  const onSubmit = async (data: RegisterSchemaType) => {
     setIsLoading(true);
 
-    const response = await registerUser(
-      emailRef.current,
-      passwordRef.current,
-      nameRef.current,
-    );
+    const response = await registerUser(data.email, data.password, data.name);
 
     setIsLoading(false);
-
-    console.log("response", response);
 
     if (!response.success) {
       Alert.alert("Cadastrar", response.msg);
@@ -61,44 +63,68 @@ const Register = () => {
             Crie uma conta para controlar suas despesas
           </Typo>
 
-          <Input
-            placeholder="Informe seu nome"
-            onChangeText={(value) => (nameRef.current = value)}
-            icon={
-              <Icons.UserIcon
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
+          <Controller
+            control={control}
+            name="name"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Informe seu nome"
+                onChangeText={onChange}
+                value={value}
+                error={errors.name?.message}
+                icon={
+                  <Icons.UserIcon
+                    size={verticalScale(26)}
+                    color={colors.neutral300}
+                    weight="fill"
+                  />
+                }
               />
-            }
+            )}
           />
 
-          <Input
-            placeholder="Informe seu e-mail"
-            onChangeText={(value) => (emailRef.current = value)}
-            icon={
-              <Icons.AtIcon
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Informe seu e-mail"
+                onChangeText={onChange}
+                value={value}
+                error={errors.email?.message}
+                icon={
+                  <Icons.AtIcon
+                    size={verticalScale(26)}
+                    color={colors.neutral300}
+                    weight="fill"
+                  />
+                }
               />
-            }
+            )}
           />
 
-          <Input
-            placeholder="Informe suas senha"
-            secureTextEntry
-            onChangeText={(value) => (passwordRef.current = value)}
-            icon={
-              <Icons.LockIcon
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Informe sua senha"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                error={errors.password?.message}
+                icon={
+                  <Icons.LockIcon
+                    size={verticalScale(26)}
+                    color={colors.neutral300}
+                    weight="fill"
+                  />
+                }
               />
-            }
+            )}
           />
 
-          <Button loading={isLoading} onPress={handleSubmit}>
+          <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
             <Typo fontWeight={"700"} color={colors.black} size={21}>
               Cadastrar
             </Typo>
