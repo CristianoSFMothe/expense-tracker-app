@@ -84,6 +84,8 @@ const Login = () => {
                     weight="fill"
                   />
                 }
+                accessibilityLabel="Input Email"
+                testID="input-email"
               />
             )}
           />
@@ -106,15 +108,28 @@ const Login = () => {
                     weight="fill"
                   />
                 }
+                accessibilityLabel="Input Password"
+                testID="input-password"
               />
             )}
           />
 
-          <Typo size={14} color={colors.text} style={{ alignSelf: "flex-end" }}>
+          <Typo
+            size={14}
+            color={colors.text}
+            style={{ alignSelf: "flex-end" }}
+            testID="forgot-password-text"
+            accessibilityLabel="Forgot Password Text"
+          >
             Esqueceu a senha?
           </Typo>
 
-          <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
+          <Button
+            loading={isLoading}
+            onPress={handleSubmit(onSubmit)}
+            testID="login-button"
+            accessibilityLabel="Login Button"
+          >
             <Typo fontWeight={"700"} color={colors.black} size={21}>
               Entrar
             </Typo>
@@ -123,7 +138,11 @@ const Login = () => {
 
         <View style={styles.footer}>
           <Typo size={15}>Não tem uma conta?</Typo>
-          <Pressable onPress={() => router.navigate("/(auth)/register")}>
+          <Pressable
+            onPress={() => router.navigate("/(auth)/register")}
+            testID="register-button"
+            accessibilityLabel="Register Button"
+          >
             <Typo size={15} fontWeight={"700"} color={colors.primary}>
               Inscrever-se
             </Typo>

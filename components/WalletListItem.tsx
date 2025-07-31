@@ -36,18 +36,40 @@ const WalletListItem = ({
         .springify()
         .damping(13)}
     >
-      <TouchableOpacity style={styles.container} onPress={openWallet}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={openWallet}
+        testID={`wallet-item-${index}`}
+        accessibilityLabel={`wallet-item-${index}`}
+      >
         <View style={styles.imageContainer}>
           <Image
             style={{ flex: 1 }}
             source={item?.image}
             contentFit="cover"
             transition={100}
+            testID="wallet-image"
+            accessibilityLabel="wallet-image"
           />
         </View>
-        <View style={styles.nameContainer}>
-          <Typo size={16}>{item?.name}</Typo>
-          <Typo size={14} color={colors.neutral400}>
+        <View
+          style={styles.nameContainer}
+          testID="name-container"
+          accessibilityLabel="name-container"
+        >
+          <Typo
+            size={16}
+            testID={`wallet-name-${item?.name}`}
+            accessibilityLabel={`wallet-name-${item?.name}`}
+          >
+            {item?.name}
+          </Typo>
+          <Typo
+            size={14}
+            color={colors.neutral400}
+            testID="wallet-amount"
+            accessibilityLabel="wallet-amount"
+          >
             {formatCurrency(item?.amount || 0)}
           </Typo>
         </View>
@@ -56,6 +78,7 @@ const WalletListItem = ({
           size={verticalScale(20)}
           weight="bold"
           color={colors.white}
+          testID="wallet-caret-icon"
         />
       </TouchableOpacity>
     </Animated.View>

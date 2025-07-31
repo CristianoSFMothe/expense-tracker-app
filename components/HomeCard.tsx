@@ -39,22 +39,35 @@ const HomeCard = () => {
       source={require("../assets/images/card.png")}
       resizeMode="stretch"
       style={styles.bgImage}
-      accessibilityLabel="Card"
+      accessibilityLabel="card"
     >
       <View style={styles.container}>
-        <View>
+        <View accessible accessibilityLabel="total-balance-section">
           {/* Total Balance */}
           <View style={styles.totalBalanceRow}>
-            <Typo color={colors.neutral800} size={17} fontWeight={"500"}>
+            <Typo
+              color={colors.neutral800}
+              size={17}
+              fontWeight={"500"}
+              accessibilityLabel="total-balance-label"
+              testID="total-balance-label"
+            >
               Saldo total
             </Typo>
             <Icons.DotsThreeOutlineIcon
               size={verticalScale(23)}
               color={colors.black}
               weight="fill"
+              testID="options-icon"
             />
           </View>
-          <Typo color={colors.black} size={30} fontWeight={"bold"}>
+          <Typo
+            color={colors.black}
+            size={30}
+            fontWeight={"bold"}
+            accessibilityLabel="total-balance-value"
+            testID="total-balance-value"
+          >
             {walletLoading
               ? "----"
               : formatCurrency(getTotals().balance?.toFixed(2))}
@@ -62,7 +75,11 @@ const HomeCard = () => {
         </View>
 
         {/* Total Expense and Income */}
-        <View style={styles.stats}>
+        <View
+          style={styles.stats}
+          accessible
+          accessibilityLabel="income-expense-section"
+        >
           {/* Income */}
           <View style={{ gap: verticalScale(5) }}>
             <View style={styles.incomeExpense}>
@@ -71,15 +88,28 @@ const HomeCard = () => {
                   size={verticalScale(15)}
                   color={colors.black}
                   weight="bold"
+                  testID="income-icon"
                 />
               </View>
-              <Typo size={16} color={colors.neutral700} fontWeight={"500"}>
+              <Typo
+                size={16}
+                color={colors.neutral700}
+                fontWeight={"500"}
+                accessibilityLabel="income-label"
+                testID="income-label"
+              >
                 Renda
               </Typo>
             </View>
 
             <View style={{ alignSelf: "center" }}>
-              <Typo size={17} color={colors.green} fontWeight={"600"}>
+              <Typo
+                size={17}
+                color={colors.green}
+                fontWeight={"600"}
+                accessibilityLabel="income-value"
+                testID="income-value"
+              >
                 {walletLoading
                   ? "----"
                   : formatCurrency(getTotals().income?.toFixed(2))}
@@ -95,15 +125,28 @@ const HomeCard = () => {
                   size={verticalScale(15)}
                   color={colors.black}
                   weight="bold"
+                  testID="expense-icon"
                 />
               </View>
-              <Typo size={16} color={colors.neutral700} fontWeight={"500"}>
+              <Typo
+                size={16}
+                color={colors.neutral700}
+                fontWeight={"500"}
+                accessibilityLabel="expense-label"
+                testID="expense-label"
+              >
                 Despesa
               </Typo>
             </View>
 
             <View style={{ alignSelf: "center" }}>
-              <Typo size={17} color={colors.rose} fontWeight={"600"}>
+              <Typo
+                size={17}
+                color={colors.rose}
+                fontWeight={"600"}
+                accessibilityLabel="expense-value"
+                testID="expense-value"
+              >
                 {walletLoading
                   ? "----"
                   : formatCurrency(getTotals().expenses?.toFixed(2))}

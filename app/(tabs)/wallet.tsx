@@ -56,6 +56,8 @@ const Wallet = () => {
 
             <TouchableOpacity
               onPress={() => router.push("/(modals)/walletModal")}
+              testID="add-wallet-button"
+              accessibilityLabel="Add Wallet Button"
             >
               <Icons.PlusCircleIcon
                 weight="fill"

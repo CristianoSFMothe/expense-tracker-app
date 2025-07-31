@@ -427,6 +427,8 @@ const TransactionModal = () => {
               backgroundColor: colors.rose,
               paddingHorizontal: spacingX._15,
             }}
+            accessibilityLabel="Delete Button"
+            testID="delete-button"
           >
             <Icons.TrashIcon
               color={colors.white}
@@ -439,7 +441,7 @@ const TransactionModal = () => {
           onPress={onSubmit}
           style={{ flex: 1 }}
           loading={loading}
-          accessibilityLabel="Botão Atualizar"
+          accessibilityLabel="Submit Button"
           testID="submit-button"
         >
           <Typo color={colors.black} fontWeight={"700"}>

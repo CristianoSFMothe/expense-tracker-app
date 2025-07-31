@@ -14,7 +14,7 @@ const BackButton = ({ style, iconSize = 26 }: BackButtonProps) => {
       onPress={() => router.back()}
       style={[styles.button, style]}
       accessible={true}
-      accessibilityLabel="back button"
+      accessibilityLabel="Back Button"
       testID="back-button"
     >
       <CaretLeftIcon

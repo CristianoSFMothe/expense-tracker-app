@@ -134,8 +134,8 @@ const WalletModal = () => {
           <View
             style={styles.inputContainer}
             accessible={true}
-            // accessibilityLabel="Campo de nome da carteira"
-            // testID="input-name-container"
+            accessibilityLabel="iInput Name Container"
+            testID="input-name-container"
           >
             <Typo color={colors.neutral200}>Carteira ícone</Typo>
             {/* Image input */}
@@ -169,7 +169,7 @@ const WalletModal = () => {
           onPress={onSubmit}
           style={{ flex: 1 }}
           loading={isLoading}
-          accessibilityLabel="Botão Atualizar"
+          accessibilityLabel="Submit Button"
           testID="submit-button"
         >
           <Typo color={colors.black} fontWeight={"700"}>

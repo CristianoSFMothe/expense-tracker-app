@@ -15,6 +15,7 @@ export function CustomTabs({
         size={verticalScale(30)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
+        testID="home-tab-icon"
       />
     ),
     statistics: (isFocused: boolean) => (
@@ -22,6 +23,7 @@ export function CustomTabs({
         size={verticalScale(30)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
+        testID="statistics-tab-icon"
       />
     ),
     wallet: (isFocused: boolean) => (
@@ -29,6 +31,7 @@ export function CustomTabs({
         size={verticalScale(30)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
+        testID="wallet-tab-icon"
       />
     ),
     profile: (isFocused: boolean) => (
@@ -36,6 +39,7 @@ export function CustomTabs({
         size={verticalScale(30)}
         weight={isFocused ? "fill" : "regular"}
         color={isFocused ? colors.primary : colors.neutral400}
+        testID="profile-tab-icon"
       />
     ),
   };

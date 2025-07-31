@@ -64,7 +64,13 @@ export default function Welcome() {
             style={styles.buttonContainer}
           >
             <Button onPress={() => router.push("/(auth)/register")}>
-              <Typo size={20} color={colors.neutral900} fontWeight={"600"}>
+              <Typo
+                size={20}
+                color={colors.neutral900}
+                fontWeight={"600"}
+                testID="Login Button"
+                accessibilityLabel="login-button"
+              >
                 Comece Agora
               </Typo>
             </Button>

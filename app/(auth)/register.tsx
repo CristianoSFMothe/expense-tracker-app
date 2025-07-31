@@ -79,6 +79,8 @@ const Register = () => {
                     weight="fill"
                   />
                 }
+                accessibilityLabel="Input Name"
+                testID="input-name"
               />
             )}
           />
@@ -99,6 +101,8 @@ const Register = () => {
                     weight="fill"
                   />
                 }
+                accessibilityLabel="Input Email"
+                testID="input-email"
               />
             )}
           />
@@ -120,21 +124,41 @@ const Register = () => {
                     weight="fill"
                   />
                 }
+                accessibilityLabel="Input Password"
+                testID="input-password"
               />
             )}
           />
 
           <Button loading={isLoading} onPress={handleSubmit(onSubmit)}>
-            <Typo fontWeight={"700"} color={colors.black} size={21}>
+            <Typo
+              fontWeight={"700"}
+              color={colors.black}
+              size={21}
+              accessibilityLabel="Button Register"
+              testID="button-register"
+            >
               Cadastrar
             </Typo>
           </Button>
         </View>
 
         <View style={styles.footer}>
-          <Typo size={15}>Já tem uma conta?</Typo>
+          <Typo
+            size={15}
+            accessibilityLabel="Button New Account"
+            testID="button-new-account"
+          >
+            Já tem uma conta?
+          </Typo>
           <Pressable onPress={() => router.navigate("/(auth)/login")}>
-            <Typo size={15} fontWeight={"700"} color={colors.primary}>
+            <Typo
+              size={15}
+              fontWeight={"700"}
+              color={colors.primary}
+              accessibilityLabel="Button Login"
+              testID="button-login"
+            >
               Entrar
             </Typo>
           </Pressable>

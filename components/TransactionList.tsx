@@ -43,7 +43,7 @@ const TransactionList = ({
   return (
     <View style={styles.container}>
       {title && (
-        <Typo size={20} fontWeight={"500"}>
+        <Typo size={20} fontWeight={"500"} testID="transaction-list-title">
           {title}
         </Typo>
       )}
@@ -59,6 +59,7 @@ const TransactionList = ({
             />
           )}
           estimatedItemSize={60}
+          testID="transaction-list"
         />
       </View>
 
@@ -67,13 +68,18 @@ const TransactionList = ({
           size={15}
           color={colors.neutral400}
           style={{ textAlign: "center", marginTop: spacingY._15 }}
+          testID="transaction-list-empty-message"
+          accessibilityLabel={emptyListMessage}
         >
           {emptyListMessage}
         </Typo>
       )}
 
       {loading && (
-        <View style={{ top: verticalScale(100), marginTop: spacingY._15 }}>
+        <View
+          style={{ top: verticalScale(100), marginTop: spacingY._15 }}
+          testID="transaction-list-loading"
+        >
           <Loading />
         </View>
       )}
@@ -100,13 +106,29 @@ const TransactionItem = ({
       month: "short",
     });
 
+  const formattedAmount = formatCurrency(item?.amount);
+  const sign = item?.type === "income" ? "+" : "-";
+  const accessibilityAmount = `${
+    item?.type === "income" ? "Entrada de" : "Saída de"
+  } ${formattedAmount}`;
+  const accessibilityDescription = item?.description
+    ? `, descrição ${item.description}`
+    : "";
+  const fullAccessibilityLabel = `Transação de ${category.label}, ${accessibilityAmount}${accessibilityDescription}. Toque para ver detalhes.`;
+
   return (
     <Animated.View
       entering={FadeInDown.delay(index * 70)
         .springify()
         .damping(14)}
     >
-      <TouchableOpacity style={styles.row} onPress={() => handleClick(item)}>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={() => handleClick(item)}
+        testID={`transaction-item-${item.id || index}`}
+        accessibilityRole="button"
+        accessibilityLabel={fullAccessibilityLabel}
+      >
         <View style={[styles.icon, { backgroundColor: category.bgColor }]}>
           {IconComponent && (
             <IconComponent
@@ -118,11 +140,19 @@ const TransactionItem = ({
         </View>
 
         <View style={styles.categoryDes}>
-          <Typo size={17}>{category.label}</Typo>
+          <Typo
+            size={17}
+            testID={`item-category-${category?.value}-${index}`}
+            accessibilityLabel={`item-category-${category?.value}`}
+          >
+            {category.label}
+          </Typo>
           <Typo
             size={12}
             color={colors.neutral400}
-            textProps={{ numberOfLines: 1 }}
+            numberOfLines={1}
+            testID={`item-description-${category?.description}-${index}`}
+            accessibilityLabel={`item-category-${category?.description}-${index}`}
           >
             {item?.description}
           </Typo>
@@ -133,12 +163,15 @@ const TransactionItem = ({
             color={item?.type === "income" ? colors.primary : colors.rose}
             fontWeight={"500"}
           >
-            {`${item?.type === "income" ? "+ " : "- "}${formatCurrency(
-              item?.amount,
-            )}`}
+            {`${sign} ${formattedAmount}`}
           </Typo>
 
-          <Typo size={13} color={colors.neutral400}>
+          <Typo
+            size={13}
+            color={colors.neutral400}
+            testID={`transaction-item-date-${date}-${index}`}
+            accessibilityLabel={`item-date-${date}-${index}`}
+          >
             {date}
           </Typo>
         </View>
