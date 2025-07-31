@@ -35,22 +35,43 @@ const ImageUpload = ({
         <TouchableOpacity
           onPress={pickImage}
           style={[styles.inputContainer, containerStyle && containerStyle]}
+          testID="image-picker-button"
+          accessibilityLabel="image-picker-button"
         >
           <Icons.UploadSimpleIcon color={colors.neutral200} />
-          {placeholder && <Typo size={15}>{placeholder}</Typo>}
+          {placeholder && (
+            <Typo
+              size={15}
+              testID="image-picker-placeholder"
+              accessibilityLabel="image-picker-placeholder"
+            >
+              {placeholder}
+            </Typo>
+          )}
         </TouchableOpacity>
       )}
 
       {file && (
-        <View style={[styles.image, imageStyle && imageStyle]}>
+        <View
+          style={[styles.image, imageStyle && imageStyle]}
+          testID="uploaded-image-container"
+          accessibilityLabel="uploaded-image-container"
+        >
           <Image
             style={{ flex: 1 }}
             source={getFilePath(file)}
             contentFit="cover"
             transition={100}
+            testID="Uploaded Image"
+            accessibilityLabel="uploaded-image"
           />
 
-          <TouchableOpacity style={styles.deleteIcon} onPress={onClear}>
+          <TouchableOpacity
+            style={styles.deleteIcon}
+            onPress={onClear}
+            testID="delete-image-button"
+            accessibilityLabel="delete-image-button"
+          >
             <Icons.XCircleIcon
               size={verticalScale(24)}
               weight="fill"

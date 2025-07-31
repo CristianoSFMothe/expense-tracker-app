@@ -6,27 +6,41 @@ import Typo from "@/components/Typo";
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import { verticalScale } from "@/utils/styling";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import * as Icons from "phosphor-react-native";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { z } from "zod";
+
+// Schema de validação
+const loginSchema = z.object({
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+});
+type LoginSchemaType = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const emailRef = useRef("");
-  const passwordRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login: loginUser } = useAuth();
 
-  const handleSubmit = async () => {
-    if (!emailRef.current || !passwordRef.current) {
-      Alert.alert("Login", "Por favor, preencha todos os campos.");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginSchemaType>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  const onSubmit = async (data: LoginSchemaType) => {
     setIsLoading(true);
-
-    const response = await loginUser(emailRef.current, passwordRef.current);
+    const response = await loginUser(data.email, data.password);
     setIsLoading(false);
 
     if (!response.success) {
@@ -53,36 +67,69 @@ const Login = () => {
             Faça login agora para acompanhar suas despesas
           </Typo>
 
-          <Input
-            placeholder="Informe seu e-mail"
-            onChangeText={(value) => (emailRef.current = value)}
-            icon={
-              <Icons.AtIcon
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
+          {/* Campo Email */}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Informe seu e-mail"
+                onChangeText={onChange}
+                value={value}
+                error={errors.email?.message}
+                icon={
+                  <Icons.AtIcon
+                    size={verticalScale(26)}
+                    color={colors.neutral300}
+                    weight="fill"
+                  />
+                }
+                accessibilityLabel="Input Email"
+                testID="input-email"
               />
-            }
+            )}
           />
 
-          <Input
-            placeholder="Informe suas senha"
-            secureTextEntry
-            onChangeText={(value) => (passwordRef.current = value)}
-            icon={
-              <Icons.LockIcon
-                size={verticalScale(26)}
-                color={colors.neutral300}
-                weight="fill"
+          {/* Campo Senha */}
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, value } }) => (
+              <Input
+                placeholder="Informe sua senha"
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                error={errors.password?.message}
+                icon={
+                  <Icons.LockIcon
+                    size={verticalScale(26)}
+                    color={colors.neutral300}
+                    weight="fill"
+                  />
+                }
+                accessibilityLabel="Input Password"
+                testID="input-password"
               />
-            }
+            )}
           />
 
-          <Typo size={14} color={colors.text} style={{ alignSelf: "flex-end" }}>
-            Esquece a senha?
+          <Typo
+            size={14}
+            color={colors.text}
+            style={{ alignSelf: "flex-end" }}
+            testID="forgot-password-text"
+            accessibilityLabel="Forgot Password Text"
+          >
+            Esqueceu a senha?
           </Typo>
 
-          <Button loading={isLoading} onPress={handleSubmit}>
+          <Button
+            loading={isLoading}
+            onPress={handleSubmit(onSubmit)}
+            testID="login-button"
+            accessibilityLabel="Login Button"
+          >
             <Typo fontWeight={"700"} color={colors.black} size={21}>
               Entrar
             </Typo>
@@ -91,7 +138,11 @@ const Login = () => {
 
         <View style={styles.footer}>
           <Typo size={15}>Não tem uma conta?</Typo>
-          <Pressable onPress={() => router.navigate("/(auth)/register")}>
+          <Pressable
+            onPress={() => router.navigate("/(auth)/register")}
+            testID="register-button"
+            accessibilityLabel="Register Button"
+          >
             <Typo size={15} fontWeight={"700"} color={colors.primary}>
               Inscrever-se
             </Typo>
@@ -110,11 +161,6 @@ const styles = StyleSheet.create({
     gap: spacingY._30,
     paddingHorizontal: spacingX._20,
   },
-  welcomeText: {
-    fontSize: verticalScale(20),
-    fontWeight: "bold",
-    color: colors.text,
-  },
   form: {
     gap: spacingY._20,
   },
@@ -123,10 +169,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     gap: 5,
-  },
-  footerText: {
-    textAlign: "center",
-    color: colors.text,
-    fontSize: verticalScale(15),
   },
 });

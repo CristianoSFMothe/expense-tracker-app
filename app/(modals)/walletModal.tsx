@@ -1,3 +1,9 @@
+import React, { useEffect } from "react";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+
 import BackButton from "@/components/BackButton";
 import Button from "@/components/Button";
 import Header from "@/components/Header";
@@ -5,78 +11,63 @@ import ImageUpload from "@/components/ImageUpload";
 import Input from "@/components/Input";
 import ModalWrapper from "@/components/ModalWrapper";
 import Typo from "@/components/Typo";
+
 import { colors, spacingX, spacingY } from "@/constants/theme";
 import { useAuth } from "@/contexts/authContext";
 import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
-import { WalletType } from "@/types";
 import { scale, verticalScale } from "@/utils/styling";
 import { useLocalSearchParams, useRouter } from "expo-router";
+
 import * as Icons from "phosphor-react-native";
-import React, { useEffect, useState } from "react";
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+
+import { walletSchema, WalletSchemaType } from "@/schemas/walletSchema";
 
 const WalletModal = () => {
-  const { user, updateUserData } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
-
   const oldWallet: { name: string; image: string; id: string } =
     useLocalSearchParams();
 
-  const [wallet, setWallet] = useState<WalletType>({
-    name: "",
-    image: null,
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<WalletSchemaType>({
+    resolver: zodResolver(walletSchema),
+    defaultValues: {
+      name: "",
+      image: null,
+    },
   });
 
   useEffect(() => {
     if (oldWallet?.id) {
-      setWallet({
-        name: oldWallet.name,
-        image: oldWallet.image,
-      });
+      setValue("name", oldWallet.name);
+      setValue("image", oldWallet.image);
     }
-  }, []);
+  }, [oldWallet, setValue]);
 
-  const [isLoading, setIsLoading] = useState(false);
-
-  const onSubmit = async () => {
-    let { name, image } = wallet;
-
-    if (!name.trim() || !image) {
-      Alert.alert("Carteira", "Por favor, preencha todos os campos.");
-      return;
-    }
-
-    const data: WalletType = {
-      name,
-      image,
+  const onSubmit = async (data: WalletSchemaType) => {
+    const payload = {
+      ...data,
       uid: user?.uid,
+      id: oldWallet?.id,
     };
 
-    if (oldWallet?.id) data.id = oldWallet?.id;
-
-    setIsLoading(true);
-
-    const response = await createOrUpdateWallet(data);
-
-    setIsLoading(false);
+    const response = await createOrUpdateWallet(payload);
 
     if (response.success) {
-      // TODO: Adicionar um toast como "Carteira criada com sucesso"
       router.back();
     } else {
       Alert.alert("Carteira", response.msg || "Erro ao criar carteira");
-      // TODO: Adicionar um toast de erro
     }
   };
 
   const onDelete = async () => {
     if (!oldWallet?.id) return;
 
-    setIsLoading(true);
-
-    const response = await deleteWallet(oldWallet?.id);
-
-    setIsLoading(false);
+    const response = await deleteWallet(oldWallet.id);
 
     if (response.success) {
       router.back();
@@ -90,16 +81,8 @@ const WalletModal = () => {
       "Confirmação",
       "Tem certeza de que deseja fazer isso? \nEsta ação removerá todas as transações relacionadas a esta carteira.",
       [
-        {
-          text: "Cancelar",
-          onPress: () => console.log("Cancel Pressed"),
-          style: "cancel",
-        },
-        {
-          text: "Confirmar",
-          onPress: () => onDelete(),
-          style: "destructive",
-        },
+        { text: "Cancelar", style: "cancel" },
+        { text: "Confirmar", onPress: () => onDelete(), style: "destructive" },
       ],
     );
   };
@@ -113,44 +96,66 @@ const WalletModal = () => {
           style={{ marginBottom: spacingY._10 }}
         />
 
-        {/* Form */}
         <ScrollView contentContainerStyle={styles.form}>
-          <View
-            style={styles.inputContainer}
-            accessible={true}
-            accessibilityLabel="Campo de nome da carteira"
-            testID="input-name-container"
-          >
+          <View style={styles.inputContainer}>
             <Typo color={colors.neutral200}>Carteira</Typo>
-            <Input
-              placeholder="Nome da carteira"
-              value={wallet.name}
-              onChangeText={(value) => setWallet({ ...wallet, name: value })}
-              accessibilityLabel="Input Wallet Nome"
-              testID="input-wallet-name"
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <>
+                  <Input
+                    placeholder="Nome da carteira"
+                    value={value}
+                    onChangeText={onChange}
+                    accessibilityLabel="Input Wallet Nome"
+                  />
+                  {errors.name && (
+                    <Typo color={colors.rose} size={12}>
+                      {errors.name.message}
+                    </Typo>
+                  )}
+                </>
+              )}
             />
           </View>
 
+<<<<<<< HEAD
           <View
             style={styles.inputContainer}
             accessible={true}
-            // accessibilityLabel="Campo de nome da carteira"
-            // testID="input-name-container"
+            accessibilityLabel="iInput Name Container"
+            testID="input-name-container"
           >
+=======
+          <View style={styles.inputContainer}>
+>>>>>>> 2abd9e2ba8e930203dd86393d94a2566f3d736fc
             <Typo color={colors.neutral200}>Carteira ícone</Typo>
-            {/* Image input */}
-            <ImageUpload
-              file={wallet.image}
-              onClear={() => setWallet({ ...wallet, image: null })}
-              onSelect={(file) => setWallet({ ...wallet, image: file })}
-              placeholder="Upload imagem"
+            <Controller
+              control={control}
+              name="image"
+              render={({ field: { value, onChange } }) => (
+                <>
+                  <ImageUpload
+                    file={value}
+                    onClear={() => onChange(null)}
+                    onSelect={(file) => onChange(file)}
+                    placeholder="Upload imagem"
+                  />
+                  {errors.image && (
+                    <Typo color={colors.rose} size={12}>
+                      {errors.image.message}
+                    </Typo>
+                  )}
+                </>
+              )}
             />
           </View>
         </ScrollView>
       </View>
 
       <View style={styles.footer}>
-        {oldWallet?.id && !isLoading && (
+        {oldWallet?.id && !isSubmitting && (
           <Button
             onPress={showDeleteAlert}
             style={{
@@ -165,11 +170,17 @@ const WalletModal = () => {
             />
           </Button>
         )}
+
         <Button
-          onPress={onSubmit}
+          onPress={handleSubmit(onSubmit)}
           style={{ flex: 1 }}
+<<<<<<< HEAD
           loading={isLoading}
+          accessibilityLabel="Submit Button"
+=======
+          loading={isSubmitting}
           accessibilityLabel="Botão Atualizar"
+>>>>>>> 2abd9e2ba8e930203dd86393d94a2566f3d736fc
           testID="submit-button"
         >
           <Typo color={colors.black} fontWeight={"700"}>
@@ -203,35 +214,6 @@ const styles = StyleSheet.create({
   form: {
     gap: spacingY._30,
     marginTop: spacingY._15,
-  },
-  avatarContainer: {
-    position: "relative",
-    alignSelf: "center",
-  },
-  avatar: {
-    alignSelf: "center",
-    backgroundColor: colors.neutral300,
-    height: verticalScale(135),
-    width: verticalScale(135),
-    borderRadius: 200,
-    borderWidth: 1,
-    borderColor: colors.neutral500,
-  },
-  editIcon: {
-    position: "absolute",
-    bottom: spacingY._5,
-    right: spacingY._7,
-    borderRadius: 100,
-    backgroundColor: colors.neutral100,
-    shadowColor: colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 4,
-    padding: spacingY._7,
   },
   inputContainer: {
     gap: spacingY._10,

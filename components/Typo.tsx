@@ -1,8 +1,20 @@
 import { colors } from "@/constants/theme";
-import { TypoProps } from "@/types";
 import { verticalScale } from "@/utils/styling";
 import React from "react";
-import { StyleSheet, Text, TextStyle } from "react-native";
+import {
+  TextProps as RNTextProps,
+  StyleSheet,
+  Text,
+  TextStyle,
+} from "react-native";
+
+type TypoProps = {
+  size?: number;
+  color?: string;
+  fontWeight?: TextStyle["fontWeight"];
+  children: React.ReactNode;
+  style?: TextStyle | TextStyle[];
+} & RNTextProps; // <- Aqui está o segredo
 
 const Typo = ({
   size,
@@ -10,7 +22,7 @@ const Typo = ({
   fontWeight = "400",
   children,
   style,
-  textProps = {},
+  ...textProps // <- Aqui espalhamos todas as props extras
 }: TypoProps) => {
   const textStyle: TextStyle = {
     fontSize: size ? verticalScale(size) : verticalScale(18),

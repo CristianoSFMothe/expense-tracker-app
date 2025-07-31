@@ -80,6 +80,8 @@ export type CategoryType = {
   value: string;
   icon: Icon;
   bgColor: string;
+  description?: string;
+  date?: string;
 };
 export type ExpenseCategoriesType = {
   [key: string]: CategoryType;

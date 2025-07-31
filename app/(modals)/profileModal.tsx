@@ -105,7 +105,7 @@ const ProfileModal = () => {
             <TouchableOpacity
               onPress={onPickImage}
               style={styles.editIcon}
-              accessibilityLabel="Botão para editar imagem"
+              accessibilityLabel="edit-image-button"
               testID="edit-image-button"
             >
               <Icons.PencilIcon
@@ -140,10 +140,15 @@ const ProfileModal = () => {
           onPress={onSubmit}
           style={{ flex: 1 }}
           loading={isLoading}
-          accessibilityLabel="Botão Atualizar"
-          testID="submit-button"
+          accessibilityLabel="Input Nome"
+          testID="input-name"
         >
-          <Typo color={colors.black} fontWeight={"700"}>
+          <Typo
+            color={colors.black}
+            fontWeight={"700"}
+            accessibilityLabel="Button Edit"
+            testID="button-edit"
+          >
             Atualizar
           </Typo>
         </Button>

@@ -88,15 +88,28 @@ const Profile = () => {
               contentFit="cover"
               transition={100}
               alt="User Avatar"
+              testID="profile-avatar"
+              accessibilityLabel="profile-avatar"
             />
           </View>
 
           {/* Name & Email */}
           <View style={styles.nameContainer}>
-            <Typo size={24} fontWeight={"600"} color={colors.neutral100}>
+            <Typo
+              size={24}
+              fontWeight={"600"}
+              color={colors.neutral100}
+              testID={`profile-name-${user?.name}`}
+              accessibilityLabel={`profile-name-${user?.name}`}
+            >
               {user?.name}
             </Typo>
-            <Typo size={15} color={colors.neutral400}>
+            <Typo
+              size={15}
+              color={colors.neutral400}
+              testID={`profile-email-${user?.email}`}
+              accessibilityLabel={`profile-email-${user?.email}`}
+            >
               {user?.email}
             </Typo>
           </View>
@@ -115,6 +128,8 @@ const Profile = () => {
                 <TouchableOpacity
                   style={styles.flexRow}
                   onPress={() => handlePress(item)}
+                  testID="account-option-item"
+                  accessibilityLabel="account-option-item"
                 >
                   {/* icon */}
                   <View
@@ -134,6 +149,7 @@ const Profile = () => {
                     size={verticalScale(20)}
                     weight="bold"
                     color={colors.white}
+                    testID="account-option-icon"
                   />
                 </TouchableOpacity>
               </Animated.View>

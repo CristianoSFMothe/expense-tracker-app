@@ -47,7 +47,7 @@ const Statistics = () => {
     if (response.success) {
       setChartData(response?.data?.stats);
     } else {
-      Alert.alert("Estadísticas", response.msg);
+      Alert.alert("Estatísticas", response.msg);
     }
   };
 
@@ -62,7 +62,7 @@ const Statistics = () => {
     if (response.success) {
       setChartData(response?.data?.stats);
     } else {
-      Alert.alert("Estadísticas", response.msg);
+      Alert.alert("Estatísticas", response.msg);
     }
   };
 
@@ -77,7 +77,7 @@ const Statistics = () => {
     if (response.success) {
       setChartData(response?.data?.stats);
     } else {
-      Alert.alert("Estadísticas", response.msg);
+      Alert.alert("Estatísticas", response.msg);
     }
   };
 
@@ -85,7 +85,7 @@ const Statistics = () => {
     <ScreenWrapper>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Header title="Estadísticas" />
+          <Header title="Estatísticas" />
         </View>
 
         <ScrollView

@@ -24,28 +24,46 @@ const Home = () => {
     limit(30),
   ];
 
-  const {
-    data: recentTransactions,
-    error,
-    loading: transactionLoading,
-  } = useFechData<TransactionType>("transactions", constraints);
+  const { data: recentTransactions, loading: transactionLoading } =
+    useFechData<TransactionType>("transactions", constraints);
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
         {/* Header */}
-        <View style={styles.header}>
-          <View style={{ gap: 4 }}>
-            <Typo size={16} color={colors.neutral400}>
+        <View
+          style={styles.header}
+          accessibilityLabel="home-header"
+          testID="home-header"
+        >
+          <View
+            style={{ gap: 4 }}
+            accessibilityLabel="greeting-section"
+            testID="greeting-section"
+            accessible={true}
+          >
+            <Typo
+              size={16}
+              color={colors.neutral400}
+              accessibilityLabel="greeting-label"
+              testID="greeting-label"
+            >
               Olá,
             </Typo>
-            <Typo size={20} fontWeight={"500"}>
+            <Typo
+              size={20}
+              fontWeight={"500"}
+              accessibilityLabel={user?.name || "greeting-username"}
+              testID={user?.name || "greeting-username"}
+            >
               {user?.name}
             </Typo>
           </View>
           <TouchableOpacity
             onPress={() => router.push("/(modals)/searchModal")}
             style={styles.searchIcon}
+            testID="open-search-modal-button"
+            accessibilityLabel="open-search-modal-button"
           >
             <Icons.MagnifyingGlassIcon
               size={verticalScale(22)}
@@ -75,6 +93,8 @@ const Home = () => {
         <Button
           style={styles.floatingButton}
           onPress={() => router.push("/(modals)/transactionModal")}
+          testID="add-transaction-button"
+          accessibilityLabel="add-transaction-button"
         >
           <Icons.PlusIcon
             color={colors.black}
