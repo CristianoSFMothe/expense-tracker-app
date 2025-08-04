@@ -1,3 +1,5 @@
-export const CLOUDINARY_CLOUD_NAME = "dqeahcmim";
+export const CLOUDINARY_CLOUD_NAME =
+  process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME;
 
-export const CLOUDINARY_UPLOAD_PRESET = "images";
+export const CLOUDINARY_UPLOAD_PRESET =
+  process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
