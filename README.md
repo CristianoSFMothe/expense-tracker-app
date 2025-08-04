@@ -109,7 +109,13 @@ npm run ios
 
 ## 📱 Screenshots
 
-> (Adicione aqui imagens das telas do app se quiser)
+<img width="417" height="963" alt="2025-08-04_09h31_16" src="https://github.com/user-attachments/assets/49a29651-6df6-4d57-9840-8fc9ccedb2c5" />
+
+<img width="417" height="963" alt="2025-08-04_09h56_14" src="https://github.com/user-attachments/assets/81f96bdd-5745-40e0-a491-8e5bf1b84a19" />
+
+<img width="417" height="963" alt="2025-08-04_09h56_25" src="https://github.com/user-attachments/assets/e0734961-381e-4e6c-9df4-ab064ab67d65" />
+
+<img width="417" height="963" alt="2025-08-04_09h56_41" src="https://github.com/user-attachments/assets/8df48162-77fb-4a4d-8577-178685a0c2e0" />
 
 ---
 
